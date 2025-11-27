@@ -39,23 +39,37 @@ OR
 docker build -t sraminer .
 ```
 
+3. Apptainer
+```
+wget https://github.com/apptainer/apptainer/releases/download/v1.4.4/apptainer_1.4.4_amd64.deb
+sudo dpkg -i apptainer_1.4.4_amd64.deb
+#failed complaining about uidmap not being installed
+
+sudo apt --fix-broken install ./apptainer_1.4.4_amd64.deb
+
+apptainer build SRAminer.sif SRAminer.def
+```
 
 ### Running the pipelines
 
-To run with tmux and independent logging run something like `tmux new-session -s some_name 'command to run | tee some_log_file.log'`
-
 1. Assembly variant
 - Local (no caching)
-`./assembly_pipeline.sh --max_num_data_slices 10 test_downloads.csv TESTING/pipeline_test | tee pipeline_test.log`
+`./assembly_pipeline.sh --max_num_data_slices 10 test_downloads.csv TESTING/pipeline_test`
 
 - Local (with caching)
-`./assembly_pipeline.sh --reference_genomes_cache GENOMES_CACHE  --max_num_data_slices 10 test_downloads.csv TESTING/pipeline_test | tee pipeline_test.log`
+`./assembly_pipeline.sh --reference_genomes_cache GENOMES_CACHE  --max_num_data_slices 10 test_downloads.csv TESTING/pipeline_test`
 
 - Docker (no caching)
-`./run_docker_analysis.sh  --docker_flags '--volume /data:/data --volume /scratch:/scratch --cpus=32' "assembly_pipeline.sh --max_num_data_slices 10 --profile FLUX $(pwd)/test_downloads.csv /scratch/assembly_test /scratch/nextflow_scratch" | tee /scratch/pipeline_test.log`
+`./run_docker_analysis.sh  --docker_flags '--volume /data:/data --volume /scratch:/scratch --cpus=32' "assembly_pipeline.sh --max_num_data_slices 10 --profile FLUX $(pwd)/test_downloads.csv /scratch/assembly_test"`
 
 - Docker (with caching) 
-`./run_docker_analysis.sh  --docker_flags '--volume /data:/data --volume /scratch:/scratch --cpus=32' "assembly_pipeline.sh --reference_genomes_cache /scratch/GENOMES_CACHE --max_num_data_slices 10 --profile FLUX $(pwd)/test_downloads.csv /scratch/assembly_test-cached /scratch/nextflow_scratch" | tee /scratch/pipeline_test-cached.log`
+`./run_docker_analysis.sh  --docker_flags '--volume /data:/data --volume /scratch:/scratch --cpus=32' "assembly_pipeline.sh --reference_genomes_cache /scratch/GENOMES_CACHE --max_num_data_slices 10 --profile FLUX $(pwd)/test_downloads.csv /scratch/assembly_test-cached /scratch/nextflow_scratch"`
+
+- Apptainer (no caching)
+`./run_apptainer_analysis.sh  assembly_pipeline test_downloads.csv TESTING/assembly_test '--max_num_data_slices 10 --profile FLUX' `
+
+- Apptainer (with caching)
+`./run_apptainer_analysis.sh  --reference_genomes_cache /scratch/GENOMES_CACHE assembly_pipeline test_downloads.csv TESTING/assembly_test '--max_num_data_slices 10 --profile FLUX' `
 
 2. Logan screen variant
 - Local (no caching)
@@ -65,7 +79,13 @@ To run with tmux and independent logging run something like `tmux new-session -s
 `./logan_screen.sh --reference_genomes_cache GENOMES_CACHE  --logan_data_cache LOGAN_CACHE contigs test_downloads.csv TESTING/logan_contigs_test`
 
 - Docker (no cache)
-`./run_docker_analysis.sh  --docker_flags '--volume /data:/data --volume /scratch:/scratch --cpus=32' "logan_screen.sh --profile FLUX contigs $(pwd)/test_downloads.csv /scratch/TESTING/logan_contigs_test" | tee /scratch/logan_test.log`
+`./run_docker_analysis.sh  --docker_flags '--volume /data:/data --volume /scratch:/scratch --cpus=32' "logan_screen.sh --profile FLUX contigs $(pwd)/test_downloads.csv /scratch/TESTING/logan_contigs_test"`
 
 - Docker (fully cached)
-`./run_docker_analysis.sh  --docker_flags '--volume /data:/data --volume /scratch:/scratch --cpus=32' "logan_screen.sh --reference_genomes_cache /scratch/GENOMES_CACHE  --logan_data_cache /scratch/LOGAN_CACHE --profile FLUX contigs $(pwd)/test_downloads.csv /scratch/TESTING/logan_contigs_test" | tee /scratch/logan_test-cached.log`
+`./run_docker_analysis.sh  --docker_flags '--volume /data:/data --volume /scratch:/scratch --cpus=32' "logan_screen.sh --reference_genomes_cache /scratch/GENOMES_CACHE  --logan_data_cache /scratch/LOGAN_CACHE --profile FLUX contigs $(pwd)/test_downloads.csv /scratch/TESTING/logan_contigs_test" `
+
+- Apptainer (no caching)
+`./run_apptainer_analysis.sh  logan_contigs_screen test_downloads.csv TESTING/logan_test '--profile FLUX' `
+
+- Apptainer (with caching)
+`./run_apptainer_analysis.sh  --reference_genomes_cache /scratch/GENOMES_CACHE --logan_data_cache /scratch/LOGAN_CACHE logan_contigs_screen test_downloads.csv TESTING/logan_test '--profile FLUX' `

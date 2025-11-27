@@ -1,0 +1,5 @@
+TESTING
+CheckM_database
+logan_accessions.parquet
+.nextflow*
+*.sif

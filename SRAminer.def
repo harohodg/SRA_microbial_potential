@@ -1,0 +1,67 @@
+Bootstrap: docker
+From: fluxrm/flux-sched:bookworm-amd64
+
+%setup
+    mkdir -p ${APPTAINER_ROOTFS}/opt/SRAminer/
+    cp -r CheckM_database ${APPTAINER_ROOTFS}/opt/SRAminer/CheckM_database || echo "CheckM_database will be downloaded later"
+    cp logan_accessions.parquet ${APPTAINER_ROOTFS}/opt/SRAminer/logan_accessions.parquet || echo "logan_accessions.parquet will be downloaded later"
+
+%files
+    nextflow.config /opt/SRAminer
+    test_downloads.csv /opt/SRAminer
+    bin /opt/SRAminer
+    modules /opt/SRAminer
+    workflows /opt/SRAminer
+
+    assembly_pipeline.sh /opt/SRAminer
+    assembly_pipeline.nf /opt/SRAminer
+
+    logan_screen.sh /opt/SRAminer
+    logan_screen.nf /opt/SRAminer
+
+    download_Checkm_database.sh /opt/SRAminer
+    download_logan_accessions.sh /opt/SRAminer 
+    init_cache.sh /opt/SRAminer 
+
+%post
+    #apply updates, install easter egg
+    apt-get -y update
+    apt-get -y install cowsay lolcat
+
+    # Install miniconda
+    wget https://repo.anaconda.com/miniconda/Miniconda3-py312_24.11.1-0-Linux-x86_64.sh -O /tmp/miniconda.sh
+    bash /tmp/miniconda.sh -b -p /opt/miniconda && rm /tmp/miniconda.sh
+
+    #Install nextflow
+    export PATH=/opt/miniconda/bin/:$PATH
+    conda install bioconda::nextflow=25.04.6
+
+    #Remove spare apt data
+    set -ex && rm -rf /var/lib/apt/lists/*
+
+    #Initialize data caches
+    cd /opt/SRAminer/   && ./init_cache.sh
+
+
+
+%environment
+    export PATH=/opt/miniconda/bin:$PATH
+    export PATH=/opt/SRAminer:$PATH
+    export LC_ALL=C
+    export PATH=/usr/games:$PATH
+
+%runscript
+    date | cowsay | lolcat
+
+
+##############################
+# assembly pipeline
+##############################
+%apprun assembly_pipeline
+    exec flux start /opt/SRAminer/assembly_pipeline.sh $@
+
+##############################
+# logan screen
+##############################
+%apprun logan_screen
+    exec flux start /opt/SRAminer/logan_screen.sh $@
