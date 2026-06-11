@@ -6,7 +6,7 @@ See Readme in individual folders for more details
 | Folder                           | Description of Contents                                                 |
 |----------------------------------|-------------------------------------------------------------------------|
 | SRAminer                         | Nextflow workflow for hybrid reference/de-novo assembly of SRA datasets |
-| GenBank_exploration              | Code used to summarize GenBank taxonomic coverage                       |
+| SETUP                            | Code used to fetch/transform the raw data                               |
 
 
 ### Data Links
