@@ -11,7 +11,9 @@
 #
 #   Version 1.0.1 : November 25, 2025
 #       - Added checking for output file
-
+#
+#   Version 1.0.2 : June 9, 2026
+#       - Updated sql query
 
 get_script_dir () {
 #Based on https://stackoverflow.com/questions/56962129/how-to-get-original-location-of-script-used-for-slurm-job
@@ -25,22 +27,16 @@ get_script_dir () {
 }
 
 
-VERSION='1.0.1'
+VERSION='1.0.2'
 SCRIPT_DIR="$(get_script_dir)"
-CONTIGS_URL='https://s3.amazonaws.com/logan-pub/stats/logan-seqstats-contigs-v1.1.parquet'
-UNITIGS_URL='https://s3.amazonaws.com/logan-pub/stats/logan-seqstats.parquet'
 OUTPUT_FILE='logan_accessions.parquet'
 
 SQL_QUERY="
-SELECT
-    contigs.accession AS contigs_accessions,
-    unitigs.accession AS unitigs_accessions
-FROM
-    read_parquet('${CONTIGS_URL}') AS contigs
-    FULL JOIN 
-    read_parquet('${UNITIGS_URL}') AS unitigs
-    USING (accession)
-ORDER BY contigs_accessions ASC
+SELECT 
+    CASE WHEN seqstats_contigs_maxlen IS NOT NULL THEN accession ELSE NULL END AS contigs_accessions,
+    CASE WHEN seqstats_unitigs_maxlen IS NOT NULL THEN accession ELSE NULL END AS unitigs_accessions,
+FROM read_parquet('s3://logan-pub/stats/logan-seqstats-contigs-v1.2.parquet')
+WHERE seqstats_contigs_maxlen IS NOT NULL OR seqstats_unitigs_maxlen IS NOT NULL
 "
 
 >&2 echo "download_logan_accessions.sh version $VERSION"
