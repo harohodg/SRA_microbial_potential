@@ -1,4 +1,4 @@
-This repository contains code and links to data for [Hodgins et. al 2026](...)
+This repository contains code for [Hodgins et. al 2026](...)
 
 ### Repository Contents
 See Readme in individual folders for more details
