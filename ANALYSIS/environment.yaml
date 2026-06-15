@@ -1,0 +1,15 @@
+name: NCBI_coverage_analysis
+channels:
+  - conda-forge
+dependencies:
+  - duckdb==1.4.1
+  - pandas==2.3.3
+  - notebook==7.3.3
+  - plotly[all]==6.0.1
+  - python-kaleido==0.2.1
+  - tqdm==4.67.1
+  - rclone==1.69.1
+  - networkx==3.5
+  - altair-all==5.5.0
+  - seaborn==0.13.2
+  - plotnine[extra]==0.15.0

@@ -1,0 +1,1 @@
+# Small nextflow workflow to summarize intermediate results from SRAminer analysis

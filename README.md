@@ -7,11 +7,4 @@ See Readme in individual folders for more details
 |----------------------------------|-------------------------------------------------------------------------|
 | SRAminer                         | Nextflow workflow for hybrid reference/de-novo assembly of SRA datasets |
 | SETUP                            | Code used to fetch/transform the raw data                               |
-
-
-### Data Links
-| Data Description                              | DOI |
-|-----------------------------------------------|-----|
-| SRA microbial STAT predictions / taxonomy map | ... |
-| SRA microbial potential                       | ... |
-| C. tarantellae pangenome                      | ... |
+| ANALYSIS                         | Code used to analyze the data                                           |
