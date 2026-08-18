@@ -12,7 +12,12 @@ The order in which tables are generated is important as some tables are based on
 This will take awhile. Go enjoy a nice coffee or alternative beverage of choice. Perhaps catch up on some reading.
 `\time -v ./summarize_assembly_results.sh ../EXTRACTED_DATA/2025_01_15-updated/2025_01_15_data-extracted-updated.db PRIMARY_DATA_TABLES ASSEMBLY_RESULTS`
 
-Note : Assembly success/failure labels are based on the intermediate files returned by each step of the pipeline. The pipeline summary cannot tell the difference between no mapped reads due to a download failure or when no reads mapped to the reference. Both cases are labeled as a failure due to  `no mapped reads`. Users should check the Nextflow log files to verify all steps exited with code 0.
+Note : Assembly success/failure labels are based on the intermediate files returned by each step of the pipeline. The pipeline summary cannot tell the difference between no mapped reads due to a download failure or when no reads mapped to the reference. Both cases are labeled as a failure due to `no mapped reads`. Users should check the Nextflow log files to verify all steps exited with code 0. This can be done using duckdb and `SELECT * FROM read_csv('nextflow_trace.txt') WHERE status = 'FAILED';` If this returns anything (example below) check the `.nextflow.log` file to verify that the failed task(s) were rerun successfully. 
+
+| task_id |   hash    | native_id |                                       name                                        | status | exit |         submit          | duration | realtime | %cpu | peak_rss | peak_vmem | rchar | wchar |
+|--------:|-----------|----------:|-----------------------------------------------------------------------------------|--------|------|-------------------------|----------|----------|------|----------|-----------|-------|-------|
+| 1303    | 44/a79b0d | 14659     | map_to_reference:MAP_TO_REFERENCE_AND_EXTRACT_READS (SRR30726812-GCA_004402695.1) | FAILED | -    | 2025-02-18 00:25:15.641 | 55m 56s  | 7m 5s    | -    | -        | -         | -     | -     |
+
 
 ## And now make some figures
 `conda run -n NCBI_coverage_analysis --live-stream python3 create_plots.py`
