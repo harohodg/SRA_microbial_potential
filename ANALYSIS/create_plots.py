@@ -28,7 +28,8 @@ def TO_PLOT(output_folder):
                 (plot_novel_fraction_failed, f'{ATTEMPTED_NOVEL_OUTPUT_ROOT}/unsuccessful/fraction_failed',  {'failure_equation':UNSUCCESSFUL_ATTEMPTED_ASSEMBLY}),
                 (plot_novel_successful_checkm_distribution, f'{ATTEMPTED_NOVEL_SUCCESSFULL_OUTPUT_ROOT}/checkm_distribution', {}),
                 (plot_novel_successful_contig_length_distribution, f'{ATTEMPTED_NOVEL_SUCCESSFULL_OUTPUT_ROOT}/medium_high_contig_lengths', {}),
-                (plot_quality_ANI_distribution, f'{ATTEMPTED_NOVEL_SUCCESSFULL_OUTPUT_ROOT}/High_ANI_distribution', {})
+                (plot_quality_ANI_distribution, f'{ATTEMPTED_NOVEL_SUCCESSFULL_OUTPUT_ROOT}/High_ANI_distribution', {}),
+                (plot_assembly_outcomes, f'{ATTEMPTED_NOVEL_SUCCESSFULL_OUTPUT_ROOT}/assembly_outcomes', {})
     ]
     
     META_DATA_PLOTS = []

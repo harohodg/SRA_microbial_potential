@@ -352,7 +352,6 @@ def plot_novel_successful_contig_length_distribution( plot_width=750, plot_heigh
     return {'novel_successful_medium_high_contig_length_distribution': (plot_query, ('tsv', plot_data), ('ggplot', plot, {'width' : 6, 'height' : 4, 'dpi' : 100}) )} 
 
 
-
 def plot_meta_data(plot_data, labels, plot_width  = 1723, plot_height = 525, all_colors = ['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf', '#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'], rotations=[0,0]):     
    
     num_categories = len(plot_data[labels].unique() )
@@ -493,3 +492,36 @@ def plot_quality_ANI_distribution(target_quality='High'):
     )
         
     return {f'{target_quality}_quality-ANI_distribution': (plot_query, ('tsv', plot_data), ('altair', plot, {}) ) }
+
+
+def plot_assembly_outcomes(num_bins=50):
+    x_label=f"printf('[%,.2f %,.2f%s', adjusted_min_coverage, adjusted_max_coverage, CASE WHEN bin = {num_bins} THEN ']' ELSE ')' END )"
+    x_axis_title='Estimated Coverage (min coverage, max_coverage)'
+    color_map = {"High":"#54a24bff","Medium":"#3e4989","Low":"#72b7b2ff","Poor":"#f58518ff","Failed":"#e45756ff"}
+
+    sql_parameters = {
+    'num_bins' : num_bins,
+    'data_table' : ATTEMPTED_ASSEMBLIES_DATA,
+    'novel_assembly' : NOVEL_ATTEMPTED_ASSEMBLY,
+    'x_label' : x_label
+    }
+    sql_file = 'SQL_queries/PLOTS/ATTEMPTED_ASSEMBLIES/novel_assemblies/assemblies_stacked_bar_chart.sql'
+    plot_query, plot_data = run_sql_query(sql_file, parameters = sql_parameters)
+    
+    bars_order = duckdb.sql("SELECT DISTINCT x_label FROM plot_data ORDER BY bin ASC").df().x_label.to_list()
+    plot = alt.Chart(plot_data).mark_bar().encode(
+            x=alt.X("x_label:N", title=x_axis_title, sort=bars_order ),
+            y=alt.Y(
+                "count(plot_label):Q",
+                stack="normalize",                 # <-- converts stacked totals to percentages
+                axis=alt.Axis(format=".0%"),     # show 0–100%
+                title="Percent of Assemblies",
+                
+            ),
+            color=alt.Color("plot_label:N", title="Assembly Status",
+                            sort=alt.Sort( list(color_map.keys()) ),
+                            scale=alt.Scale( domain=list(color_map.keys()), range=list(color_map.values())) ),
+            order=alt.Order('label_order:Q'),
+            tooltip=list(plot_data.columns)
+    )
+    return {f'assembly_outcomes': (plot_query, ('tsv', plot_data), ('altair', plot, {}) ) }
